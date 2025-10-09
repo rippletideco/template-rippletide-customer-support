@@ -1,0 +1,12 @@
+type = "agent"
+
+functions = ["all"]
+models = ["all"]
+
+[entrypoint]
+prod = ".venv/bin/python3 -m src"
+dev = ".venv/bin/uvicorn src.main:app --reload --port 1338 --host 0.0.0.0 --loop asyncio"
+
+[env]
+RIPPLETIDE_AGENT_ID = "$RIPPLETIDE_AGENT_ID"
+RIPPLETIDE_API_KEY = "${secrets.RIPPLETIDE_API_KEY}"
