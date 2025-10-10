@@ -49,11 +49,7 @@ The structure includes:
 
 3. **Define Your Tags**: Create tags that match your organization's structure and customer support categories
 
-4. **Configure Actions**: Define the actual API calls or tools your agent needs to interact with your systems
-
-5. **Set Your Guardrails**: Add company-specific compliance requirements and behavioral guidelines
-
-6. **Design Your Flow**: Customize the state_predicate.json to match your customer support workflow
+4. **Design Your Flow**: Customize the state_predicate.json to match your customer support workflow
 
 ## Running the Setup
 

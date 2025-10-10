@@ -45,7 +45,6 @@ This template shows how to integrate Rippletide's Decision Database and AI agent
 
 - **24/7 Customer Support**: Always-on AI agent providing instant assistance to customers
 - **Enterprise-Grade Reliability**: Built on Rippletide's Decision Database with <1% hallucination rate
-- **Guardrail Enforcement**: 100% adherence to predefined compliance and governance standards
 - **Knowledge Base Integration**: Unified hypergraph database for consistent, accurate responses
 - **Multi-Channel Support**: Handle customer inquiries across various communication channels
 - **Full Auditability**: Complete tracking and logging of all agent decisions and interactions
@@ -260,7 +259,6 @@ This command uses your code and the configuration files under the `.blaxel` dire
 4. **Agent Response Issues**:
    - Verify your agent's system prompt is clear and specific
    - Check knowledge base coverage for common customer queries
-   - Review guardrails configuration for compliance requirements
    - Monitor response accuracy and hallucination metrics in Rippletide dashboard
 
 5. **Python Environment Issues**:
