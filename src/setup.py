@@ -82,7 +82,7 @@ async def main():
     log_success("API key loaded successfully")
 
     # Setup API connection
-    BASE_URL = "https://agent.rippletide.com/api/sdk"
+    BASE_URL = os.getenv("BASE_URL", "https://agent.rippletide.com/api/sdk")
     headers = {
         "X-Blaxel-Api-Key": api_key,
         "Content-Type": "application/json"
