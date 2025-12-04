@@ -30,10 +30,6 @@ cd template-rippletide-customer-support
 # Install dependencies
 uv sync
 
-# Configure API key
-# Edit src/setup_sdk_agent.py, src/setup_eval_agent.py, and src/agent.py
-# Update RIPPLETIDE_API_KEY = "your-api-key-here" with your API key from https://eval.rippletide.com
-
 # Create SDK agent configuration
 cp agent_config.json.example agent_config.json
 # Edit agent_config.json with your configuration (optional)
