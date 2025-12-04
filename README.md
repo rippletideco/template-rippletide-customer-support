@@ -1,7 +1,7 @@
 # Customer Support Agent - Rippletide
 
 <p align="center">
-  <img style="border-radius:10px" src=".github/assets/cover.png" alt="Rippletide x Blaxel" width="90%"/>
+  <img style="border-radius:10px" src="img/cover.png" alt="Rippletide x Blaxel" width="90%"/>
 </p>
 
 <div align="center">
@@ -13,47 +13,12 @@
 
 </div>
 
-An intelligent customer support agent powered by Rippletide's enterprise-grade AI platform. This agent delivers 24/7 assistance with instant, accurate responses to customer inquiries while reducing ticket volume and response times.
+An intelligent customer support agent powered by Rippletide's enterprise-grade AI platform. This template supports **two ways** to create Rippletide agents:
 
-This template shows how to integrate Rippletide's Decision Database and AI agents with Blaxel to create an autonomous customer support system that handles customer inquiries with high reliability, compliance, and full auditability.
+1. **SDK Agent Creation** - Full-featured agents with tool calls, user inputs, guardrails (like `postgoux/backend/src/agent/custom_agent`)
+2. **Evaluation Agent Creation** - Agents for evaluation with PDF extraction (like `starter/rippletide_client`)
 
-## 📑 Table of Contents
-
-- [Customer Support Agent - Rippletide](#customer-support-agent---rippletide)
-  - [📑 Table of Contents](#-table-of-contents)
-  - [✨ Features](#-features)
-  - [🚀 Quick Start](#-quick-start)
-  - [📋 Prerequisites](#-prerequisites)
-  - [💻 Installation](#-installation)
-  - [⚙️ Configuration](#️-configuration)
-    - [Step 1: Get Your Rippletide API Key](#step-1-get-your-rippletide-api-key)
-    - [Step 2: Customize Your Knowledge Base](#step-2-customize-your-knowledge-base)
-    - [Step 3: Run the Setup Script](#step-3-run-the-setup-script)
-    - [Step 4: Add Agent ID to Environment](#step-4-add-agent-id-to-environment)
-  - [🔧 Usage](#-usage)
-    - [Running Locally](#running-locally)
-    - [Testing](#testing)
-    - [Deployment](#deployment)
-  - [📁 Project Structure](#-project-structure)
-  - [❓ Troubleshooting](#-troubleshooting)
-    - [Common Issues](#common-issues)
-  - [👥 Contributing](#-contributing)
-  - [🆘 Support](#-support)
-  - [📄 License](#-license)
-
-## ✨ Features
-
-- **24/7 Customer Support**: Always-on AI agent providing instant assistance to customers
-- **Enterprise-Grade Reliability**: Built on Rippletide's Decision Database with <1% hallucination rate
-- **Knowledge Base Integration**: Unified hypergraph database for consistent, accurate responses
-- **Multi-Channel Support**: Handle customer inquiries across various communication channels
-- **Full Auditability**: Complete tracking and logging of all agent decisions and interactions
-- **GDPR Compliant**: Built-in data protection and privacy compliance
-- **Scalable Architecture**: Handle high volumes of customer inquiries efficiently
-
-## 🚀 Quick Start
-
-For those who want to get up and running quickly:
+## Quick Start
 
 ```bash
 # Clone the repository
@@ -65,15 +30,16 @@ cd template-rippletide-customer-support
 # Install dependencies
 uv sync
 
-# Configure environment variables
-cp .env-sample .env
-# Add your RIPPLETIDE_API_KEY to .env
+# Configure API key
+# Edit src/setup_sdk_agent.py, src/setup_eval_agent.py, and src/agent.py
+# Update RIPPLETIDE_API_KEY = "your-api-key-here" with your API key from https://eval.rippletide.com
 
-# Customize your knowledge base (optional)
-# Edit files in knowledge-base/ folder
+# Create SDK agent configuration
+cp agent_config.json.example agent_config.json
+# Edit agent_config.json with your configuration (optional)
 
 # Run setup to create your agent in Rippletide
-uv run src/setup.py
+uv run src/setup_sdk_agent.py agent_config.json
 # This will output an Agent ID - add it to your .env file
 
 # Start the server
@@ -83,13 +49,11 @@ bl serve --hotreload
 bl chat --local template-rippletide-customer-support
 ```
 
-## 📋 Prerequisites
+## Prerequisites
 
 - **Python:** 3.10 or later
 - **[UV](https://github.com/astral-sh/uv):** An extremely fast Python package and project manager, written in Rust
-- **Rippletide API Key:** Contact [patrick@rippletide.com](mailto:patrick@rippletide.com) or [yann@rippletide.com](mailto:yann@rippletide.com) to get your API key
-  - The setup script will create your agent automatically
-  - See the [Rippletide Getting Started guide](https://sdk.rippletide.com/documentation/get_started/) for more information
+- **Rippletide API Key:** Go to [https://eval.rippletide.com](https://eval.rippletide.com), login, go to settings and get your API key.
 - **Blaxel Platform Setup:** Complete Blaxel setup by following the [quickstart guide](https://docs.blaxel.ai/Get-started#quickstart)
   - **[Blaxel CLI](https://docs.blaxel.ai/Get-started):** Ensure you have the Blaxel CLI installed. If not, install it globally:
     ```bash
@@ -100,212 +64,229 @@ bl chat --local template-rippletide-customer-support
     bl login
     ```
 
-## 💻 Installation
+## Configuration
 
-**Clone the repository and install dependencies:**
+### 1. Get Your API Key
 
-```bash
-git clone https://github.com/blaxel-ai/template-rippletide-customer-support.git
-cd template-rippletide-customer-support
-uv sync
-```
+1. Go to [https://eval.rippletide.com](https://eval.rippletide.com), login, go to settings and generate your API key
+2. Update the hardcoded API key in these files:
+   - `src/setup_sdk_agent.py` - Update `RIPPLETIDE_API_KEY = "your-api-key-here"`
+   - `src/setup_eval_agent.py` - Update `RIPPLETIDE_API_KEY = "your-api-key-here"`
+   - `src/agent.py` - Update `RIPPLETIDE_API_KEY = "your-api-key-here"`
 
-## ⚙️ Configuration
+### 2. Choose Agent Creation Method
 
-### Step 1: Get Your Rippletide API Key
-
-Contact [patrick@rippletide.com](mailto:patrick@rippletide.com) or [yann@rippletide.com](mailto:yann@rippletide.com) to get your Rippletide API key.
-
-Once you have your API key, create a `.env` file in the project root:
-
-```env
-RIPPLETIDE_API_KEY=your-api-key-here
-```
-
-### Step 2: Customize Your Knowledge Base
-
-The `knowledge-base/` folder contains sample customer support data. Customize these files for your business:
-
-- **tags.json** - Categories for organizing your knowledge (e.g., "shipping_delivery", "returns_refunds")
-- **qanda.json** - Question-answer pairs that form your agent's knowledge base
-- **state_predicate.json** - Conversation flow and decision tree
-
-See the [knowledge-base/README.md](knowledge-base/README.md) for detailed information on customizing each file.
-
-### Step 3: Run the Setup Script
-
-The setup script will create your agent in Rippletide with all the configurations from the knowledge-base folder:
+#### Option A: SDK Agent (Production)
 
 ```bash
-uv run src/setup.py
+cp agent_config.json.example agent_config.json
+# Edit agent_config.json with your config
+uv run src/setup_sdk_agent.py agent_config.json
 ```
 
-The script will:
-1. ✅ Create a customer support agent in Rippletide
-2. ✅ Set up all tags from tags.json
-3. ✅ Add Q&A pairs from qanda.json (with tag associations)
-4. ✅ Set up conversation flow from state_predicate.json
-5. ✅ Provide you with an Agent ID
+#### Option B: Evaluation Agent
 
-### Step 4: Add Agent ID to Environment
+```bash
+# Basic evaluation agent
+uv run src/setup_eval_agent.py
 
-After running the setup script, add the generated Agent ID to your `.env` file:
+# With PDF extraction
+uv run src/setup_eval_agent.py --pdf knowledge.pdf
+```
 
+### 3. Add Agent ID
+
+After setup, add to `.env`:
 ```env
-RIPPLETIDE_API_KEY=your-api-key-here
 RIPPLETIDE_AGENT_ID=your-agent-id-here
 ```
 
-## 🔧 Usage
+## Toy Examples
+
+### Example 1: Simple SDK Agent
+
+```python
+from src.rippletide_client import RippletideAgent
+
+# Initialize
+agent = RippletideAgent(api_key="your-api-key")
+
+# Create agent
+agent_data = agent.create_agent(
+    name="Toy Agent",
+    prompt="You are a helpful assistant that answers questions about toys."
+)
+
+# Simple config
+config = {
+    "agent_purpose": "Answer questions about toys",
+    "qa_pairs": [
+        {
+            "question": "What is a teddy bear?",
+            "answer": "A teddy bear is a soft toy bear, typically made of fabric and filled with stuffing."
+        }
+    ],
+    "state_predicate": {
+        "question_to_evaluate": "I cannot answer that.",
+        "re_evaluate": True,
+        "transition_kind": "end"
+    }
+}
+
+# Setup knowledge
+agent.setup_agent_knowledge(agent_data["id"], config)
+
+# Chat
+response = agent.chat("What is a teddy bear?")
+print(response["answer"])
+```
+
+### Example 2: SDK Agent with Tool Calls
+
+```python
+from src.rippletide_client import RippletideAgent
+
+agent = RippletideAgent(api_key="your-api-key")
+agent_data = agent.create_agent(
+    name="Order Status Agent",
+    prompt="You help customers check their order status."
+)
+
+config = {
+    "agent_purpose": "Help customers track orders",
+    "qa_pairs": [],
+    "tool_calls": [
+        {
+            "label": "get_order_status",
+            "description": "Get order status by order ID",
+            "api_call_config": {
+                "url": "https://api.example.com/orders/{{order_id}}",
+                "method": "GET",
+                "headers": {"x-api-key": "your-key"},
+                "body": {}
+            },
+            "required_user_inputs": ["order_id"]
+        }
+    ],
+    "user_input_collection": [
+        {
+            "label": "order_id",
+            "description": "Order number (alphanumeric)"
+        }
+    ],
+    "guardrails": [
+        {
+            "label": "privacy",
+            "description": "Never share customer data"
+        }
+    ],
+    "format_answer": "Start with 'Hello! ' and end with 'Is there anything else?'",
+    "state_predicate": {
+        "question_to_evaluate": "I cannot help with that.",
+        "re_evaluate": True,
+        "transition_kind": "end"
+    }
+}
+
+agent.setup_agent_knowledge(agent_data["id"], config)
+response = agent.chat("What's the status of order 12345?")
+```
+
+### Example 3: Evaluation Agent
+
+```python
+from src.rippletide_client import RippletideEvalClient
+
+# Initialize client
+client = RippletideEvalClient(api_key="your-api-key")
+
+# Create evaluation agent
+agent = client.create_agent(
+    name="Eval Agent",
+    seed=42,
+    num_nodes=100
+)
+
+# Extract questions from PDF
+result = client.extract_questions_from_pdf(
+    agent_id=agent['id'],
+    pdf_path="knowledge.pdf"
+)
+print(f"Extracted {len(result.get('qaPairs', []))} Q&A pairs")
+
+# Get test prompts
+test_prompts = client.get_test_prompts(agent['id'])
+for prompt in test_prompts:
+    print(f"Q: {prompt['prompt']}")
+    print(f"A: {prompt.get('expectedAnswer', 'N/A')}")
+
+# Evaluate a response
+report = client.evaluate(
+    agent_id=agent['id'],
+    question="What is this document about?",
+    expected_answer="It's about AI agents"
+)
+print(f"Label: {report['label']}")
+print(f"Justification: {report['justification']}")
+```
+
+### Example 4: Using Setup Scripts
+
+```bash
+# SDK agent
+uv run src/setup_sdk_agent.py agent_config.json
+
+# Evaluation agent
+uv run src/setup_eval_agent.py
+
+# Evaluation agent with PDF
+uv run src/setup_eval_agent.py --pdf documents/knowledge.pdf
+
+# Evaluation agent with custom base URL
+uv run src/setup_eval_agent.py --base-url http://localhost:3001
+```
+
+## 📁 Project Structure
+
+```
+blaxel/
+├── src/
+│   ├── rippletide_client.py   # RippletideAgent & RippletideEvalClient
+│   ├── setup_sdk_agent.py     # SDK agent setup script
+│   ├── setup_eval_agent.py    # Evaluation agent setup script
+│   ├── agent.py                # FastAPI agent endpoint
+│   ├── main.py                 # FastAPI app
+│   └── middleware.py           # Request middleware
+├── agent_config.json.example   # SDK agent config template
+├── pyproject.toml
+└── README.md
+```
+
+## Usage
 
 ### Running Locally
-
-Start the development server with hot reloading:
 
 ```bash
 bl serve --hotreload
 ```
 
-For production run:
-
-```bash
-bl serve
-```
-
-_Note:_ The development server automatically restarts when you make changes to the source code.
-
 ### Testing
 
-You can test your customer support agent locally:
-
 ```bash
-# Using the Blaxel CLI chat interface
 bl chat --local template-rippletide-customer-support
 ```
 
-Example customer support queries you can test:
-
-```
-I haven't received my order confirmation email. Can you help?
-```
-
-```
-What is your return policy for products purchased online?
-```
-
-```
-How can I track my order?
-```
-
-```
-I need to update my billing address. How do I do that?
-```
-
-You can also run it directly with specific input:
-
-```bash
-bl run agent rippletide-support-agent --local --data '{"inputs": "What are your business hours?"}'
-```
-
 ### Deployment
-
-When you are ready to deploy your customer support agent:
 
 ```bash
 bl deploy
 ```
 
-This command uses your code and the configuration files under the `.blaxel` directory to deploy your customer support agent on the Blaxel platform. Once deployed, your agent will be available to handle customer inquiries through your configured channels.
+## Support
 
-## 📁 Project Structure
+- [Rippletide Docs](https://docs.rippletide.com/)
+- [Blaxel Docs](https://docs.blaxel.ai)
 
-- **src/main.py** - Application entry point and FastAPI server setup
-- **src/agent.py** - Core customer support agent implementation with Rippletide API integration
-- **src/setup.py** - Setup script to create and configure your Rippletide agent
-- **src/middleware.py** - Request/response middleware and error handling
-- **knowledge-base/** - Customer support knowledge base configuration
-  - **tags.json** - Category tags for organizing knowledge
-  - **qanda.json** - Question-answer pairs for the knowledge base
-  - **state_predicate.json** - Conversation flow configuration
-  - **README.md** - Knowledge base customization guide
-- **pyproject.toml** - UV package manager configuration with dependencies
-- **blaxel.toml** - Blaxel deployment configuration
-- **.env-sample** - Environment variables template
-- **LICENSE** - MIT license file
+## License
 
-## ❓ Troubleshooting
-
-### Common Issues
-
-1. **Setup Script Issues**:
-   - Ensure `RIPPLETIDE_API_KEY` is set in your `.env` file before running `setup.py`
-   - Check that all JSON files in `knowledge-base/` are valid (use a JSON validator)
-   - If setup fails partially, you may need to delete the agent in Rippletide and run setup again
-   - Review the colored console output for specific error messages
-
-2. **Rippletide Integration Issues**:
-   - Verify your Rippletide API key is valid and active
-   - Ensure your agent ID is correct and the agent is properly configured
-   - Check that your knowledge base is populated with relevant information
-   - Review the Rippletide dashboard for agent status and logs
-   - Confirm API endpoint connectivity: `https://agent.rippletide.com/api/sdk`
-
-3. **Blaxel Platform Issues**:
-   - Ensure you're logged in to your workspace: `bl login`
-   - Verify models are available: `bl get models`
-   - Check that functions exist: `bl get functions`
-   - Review Blaxel logs for deployment or runtime errors
-
-4. **Agent Response Issues**:
-   - Verify your agent's system prompt is clear and specific
-   - Check knowledge base coverage for common customer queries
-   - Monitor response accuracy and hallucination metrics in Rippletide dashboard
-
-5. **Python Environment Issues**:
-   - Make sure you have Python 3.10+
-   - Try `uv sync --upgrade` to update dependencies
-   - Check for conflicting package versions
-   - Verify virtual environment activation with UV
-   - Ensure all required environment variables are set
-
-6. **Conversation Context Issues**:
-   - Check that conversation UUIDs are being properly tracked
-   - Verify conversation history is maintained across messages
-   - Review conversation flow in Rippletide dashboard
-
-For more help, please [submit an issue](https://github.com/blaxel-ai/template-rippletide-customer-support/issues) on GitHub.
-
-## 👥 Contributing
-
-Contributions are welcome! Here's how you can contribute:
-
-1. **Fork** the repository
-2. **Create** a feature branch:
-   ```bash
-   git checkout -b feature/amazing-feature
-   ```
-3. **Commit** your changes:
-   ```bash
-   git commit -m 'Add amazing feature'
-   ```
-4. **Push** to the branch:
-   ```bash
-   git push origin feature/amazing-feature
-   ```
-5. **Submit** a Pull Request
-
-Please make sure to update tests as appropriate and follow the code style of the project.
-
-## 🆘 Support
-
-If you need help with this template:
-
-- [Submit an issue](https://github.com/blaxel-ai/template-rippletide-customer-support/issues) for bug reports or feature requests
-- Visit the [Blaxel Documentation](https://docs.blaxel.ai) for platform guidance
-- Check the [Rippletide Documentation](https://doc.rippletide.com/) for agent configuration help
-- Visit the [Rippletide Help Center](https://help.rippletide.com/en/) for support articles
-- Join our [Discord Community](https://discord.gg/G3NqzUPcHP) for real-time assistance
-
-## 📄 License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+MIT License - see [LICENSE](LICENSE) file for details.
