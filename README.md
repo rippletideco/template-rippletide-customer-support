@@ -88,13 +88,6 @@ The script will:
    - Evaluate the answer against the expected answer from the PDF
 5. Print evaluation reports for all questions
 
-### 3. Add Agent ID
-
-After setup, add to `.env`:
-```env
-RIPPLETIDE_AGENT_ID=your-agent-id-here
-```
-
 ## Toy Examples
 
 ### Example 1: Simple SDK Agent
