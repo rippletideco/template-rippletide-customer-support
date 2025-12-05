@@ -23,7 +23,7 @@ from src.rippletide_client import RippletideAgent, RippletideEvalClient
 # Hardcoded API key - update this with your API key from https://eval.rippletide.com
 RIPPLETIDE_API_KEY = ""
 # URL for evaluation API
-RIPPLETIDE_EVAL_BASE_URL = "https://rippletide-backend-staging-gqdsh7h8drgfazdj.westeurope-01.azurewebsites.net"
+RIPPLETIDE_EVAL_BASE_URL = "https://rippletide-backend.azurewebsites.net"
 
 def load_config_file(file_path: Path) -> Any:
     """Load and parse a JSON configuration file"""
