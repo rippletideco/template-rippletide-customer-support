@@ -13,10 +13,7 @@
 
 </div>
 
-An intelligent customer support agent powered by Rippletide's enterprise-grade AI platform. This template supports **two ways** to create Rippletide agents:
-
-1. **SDK Agent Creation** - Full-featured agents with tool calls, user inputs, guardrails (like `postgoux/backend/src/agent/custom_agent`)
-2. **Evaluation Agent Creation** - Agents for evaluation with PDF extraction (like `starter/rippletide_client`)
+An intelligent customer support agent powered by Rippletide's enterprise-grade AI platform. This template creates an SDK agent, asks it questions, and evaluates the answers using Rippletide's evaluation system.
 
 ## Quick Start
 
@@ -31,15 +28,15 @@ cd template-rippletide-customer-support
 uv sync
 
 # Configure API key
-# Edit src/setup_sdk_agent.py, src/setup_eval_agent.py, and src/agent.py
-# Update RIPPLETIDE_API_KEY = "your-api-key-here" with your API key from https://eval.rippletide.com
+# Edit src/setup_agent.py and src/agent.py
+# Update RIPPLETIDE_API_KEY = "" with your API key from https://eval.rippletide.com
 
-# Create SDK agent configuration
+# Create agent configuration
 cp agent_config.json.example agent_config.json
 # Edit agent_config.json with your configuration (optional)
 
-# Run setup to create your agent in Rippletide
-uv run src/setup_sdk_agent.py agent_config.json
+# Run setup to create your agent in Rippletide and evaluate it
+uv run src/setup_agent.py agent_config.json
 # This will output an Agent ID - add it to your .env file
 
 # Start the server
@@ -70,29 +67,30 @@ bl chat --local template-rippletide-customer-support
 
 1. Go to [https://eval.rippletide.com](https://eval.rippletide.com), login, go to settings and generate your API key
 2. Update the hardcoded API key in these files:
-   - `src/setup_sdk_agent.py` - Update `RIPPLETIDE_API_KEY = "your-api-key-here"`
-   - `src/setup_eval_agent.py` - Update `RIPPLETIDE_API_KEY = "your-api-key-here"`
+   - `src/setup_agent.py` - Update `RIPPLETIDE_API_KEY = ""`
    - `src/agent.py` - Update `RIPPLETIDE_API_KEY = "your-api-key-here"`
 
-### 2. Choose Agent Creation Method
+### 2. Create and Evaluate Agent
 
-#### Option A: SDK Agent (Production)
+The setup script creates an SDK agent, extracts questions from a PDF, asks the agent each question, and evaluates all answers:
 
 ```bash
 cp agent_config.json.example agent_config.json
-# Edit agent_config.json with your config
-uv run src/setup_sdk_agent.py agent_config.json
+# Edit agent_config.json with your config (optional)
+
+# Run setup with PDF (required)
+uv run src/setup_agent.py agent_config.json --pdf knowledge.pdf
 ```
 
-#### Option B: Evaluation Agent
-
-```bash
-# Basic evaluation agent
-uv run src/setup_eval_agent.py
-
-# With PDF extraction
-uv run src/setup_eval_agent.py --pdf knowledge.pdf
-```
+The script will:
+1. Create an SDK agent using your configuration
+2. Create an evaluation agent
+3. Extract questions and expected answers from the PDF
+4. For each question from the PDF:
+   - Ask the SDK agent the question
+   - Get the agent's answer
+   - Evaluate the answer against the expected answer from the PDF
+5. Print evaluation reports for all questions
 
 ### 3. Add Agent ID
 
@@ -192,59 +190,74 @@ agent.setup_agent_knowledge(agent_data["id"], config)
 response = agent.chat("What's the status of order 12345?")
 ```
 
-### Example 3: Evaluation Agent
+### Example 3: Creating and Evaluating an Agent with PDF
 
 ```python
-from src.rippletide_client import RippletideEvalClient
+from src.rippletide_client import RippletideAgent, RippletideEvalClient
 
-# Initialize client
-client = RippletideEvalClient(api_key="your-api-key")
-
-# Create evaluation agent
-agent = client.create_agent(
-    name="Eval Agent",
-    seed=42,
-    num_nodes=100
+# Step 1: Create SDK agent
+agent = RippletideAgent(api_key="your-api-key")
+agent_data = agent.create_agent(
+    name="Customer Support Agent",
+    prompt="You are a helpful customer support agent."
 )
 
-# Extract questions from PDF
-result = client.extract_questions_from_pdf(
-    agent_id=agent['id'],
+config = {
+    "agent_purpose": "Help customers with their inquiries",
+    "qa_pairs": [
+        {
+            "question": "What are your business hours?",
+            "answer": "Monday through Friday, 9 AM to 6 PM EST"
+        }
+    ]
+}
+
+agent.setup_agent_knowledge(agent_data["id"], config)
+
+# Step 2: Create eval agent and extract questions from PDF
+eval_client = RippletideEvalClient(
+    api_key="your-api-key",
+    base_url="https://rippletide-backend-staging-gqdsh7h8drgfazdj.westeurope-01.azurewebsites.net"
+)
+
+eval_agent = eval_client.create_agent(name="Evaluation Agent")
+result = eval_client.extract_questions_from_pdf(
+    agent_id=eval_agent['id'],
     pdf_path="knowledge.pdf"
 )
-print(f"Extracted {len(result.get('qaPairs', []))} Q&A pairs")
 
-# Get test prompts
-test_prompts = client.get_test_prompts(agent['id'])
-for prompt in test_prompts:
-    print(f"Q: {prompt['prompt']}")
-    print(f"A: {prompt.get('expectedAnswer', 'N/A')}")
+qa_pairs = result.get('qaPairs', [])
 
-# Evaluate a response
-report = client.evaluate(
-    agent_id=agent['id'],
-    question="What is this document about?",
-    expected_answer="It's about AI agents"
-)
-print(f"Label: {report['label']}")
-print(f"Justification: {report['justification']}")
+# Step 3: Ask each question and evaluate
+for qa_pair in qa_pairs:
+    question = qa_pair.get('question', '')
+    expected_answer = qa_pair.get('answer', '')
+    
+    # Ask the SDK agent
+    response = agent.chat(question)
+    agent_answer = response.get("answer", "") if response else ""
+    
+    # Evaluate the answer
+    report = eval_client.evaluate(
+        agent_id=eval_agent['id'],
+        question=question,
+        expected_answer=expected_answer if expected_answer else None,
+        answer=agent_answer
+    )
+    
+    print(f"Question: {question}")
+    print(f"Label: {report['label']}")
+    print(f"Justification: {report['justification']}\n")
 ```
 
-### Example 4: Using Setup Scripts
+### Example 4: Using the Setup Script
 
 ```bash
-# SDK agent
-uv run src/setup_sdk_agent.py agent_config.json
-
-# Evaluation agent
-uv run src/setup_eval_agent.py
-
-# Evaluation agent with PDF
-uv run src/setup_eval_agent.py --pdf documents/knowledge.pdf
-
-# Evaluation agent with custom base URL
-uv run src/setup_eval_agent.py --base-url http://localhost:3001
+# Extract questions from PDF and evaluate all of them
+uv run src/setup_agent.py agent_config.json --pdf knowledge.pdf
 ```
+
+The script will extract all questions and expected answers from the PDF, ask each question to the SDK agent, and evaluate all answers.
 
 ## 📁 Project Structure
 
@@ -252,12 +265,11 @@ uv run src/setup_eval_agent.py --base-url http://localhost:3001
 blaxel/
 ├── src/
 │   ├── rippletide_client.py   # RippletideAgent & RippletideEvalClient
-│   ├── setup_sdk_agent.py     # SDK agent setup script
-│   ├── setup_eval_agent.py    # Evaluation agent setup script
+│   ├── setup_agent.py          # Unified agent setup and evaluation script
 │   ├── agent.py                # FastAPI agent endpoint
 │   ├── main.py                 # FastAPI app
 │   └── middleware.py           # Request middleware
-├── agent_config.json.example   # SDK agent config template
+├── agent_config.json.example   # Agent config template
 ├── pyproject.toml
 └── README.md
 ```

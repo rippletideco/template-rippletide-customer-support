@@ -340,7 +340,8 @@ class RippletideEvalClient:
         self,
         agent_id: str,
         question: str,
-        expected_answer: Optional[str] = None
+        expected_answer: Optional[str] = None,
+        answer: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Simple evaluation endpoint - evaluates a question and returns a report.
@@ -349,6 +350,7 @@ class RippletideEvalClient:
             agent_id: ID of the agent
             question: The question to evaluate
             expected_answer: Optional expected answer (will use knowledge base if not provided)
+            answer: Optional actual answer to evaluate (if provided, this answer will be evaluated instead of asking the agent)
             
         Returns:
             Dictionary containing evaluation report with label, justification, and facts
@@ -357,6 +359,8 @@ class RippletideEvalClient:
         payload = {'question': question}
         if expected_answer is not None:
             payload['expectedAnswer'] = expected_answer
+        if answer is not None:
+            payload['answer'] = answer
         
         response = self._make_request('POST', endpoint, json=payload)
         return response.json()
