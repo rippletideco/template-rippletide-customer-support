@@ -21,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.rippletide_client import RippletideAgent, RippletideEvalClient
 
 # Hardcoded API key - update this with your API key from https://eval.rippletide.com
-RIPPLETIDE_API_KEY = "xhwb6qWaIe76iI47QkLKuHqUQ6SFsvqmLVPMsJfOzvs"
+RIPPLETIDE_API_KEY = ""
 # URL for evaluation API
 RIPPLETIDE_EVAL_BASE_URL = "https://rippletide-backend-staging-gqdsh7h8drgfazdj.westeurope-01.azurewebsites.net"
 
@@ -173,6 +173,7 @@ def main():
         })
         
         print(f"Evaluation Label: {report.get('label', 'N/A')}")
+        print(f"Evaluation Justification: {report.get('justification', 'N/A')}")
     
     # Step 4: Print summary of all evaluation reports
     print("\n" + "=" * 60)
