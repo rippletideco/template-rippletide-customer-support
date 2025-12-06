@@ -288,6 +288,10 @@ bl deploy
 - [Rippletide Docs](https://docs.rippletide.com/)
 - [Blaxel Docs](https://docs.blaxel.ai)
 
+## Websites
+- Official Website → https://www.rippletide.com
+- Official Website → https://blaxel.ai  
+
 ## License
 
 MIT License - see [LICENSE](LICENSE) file for details.
